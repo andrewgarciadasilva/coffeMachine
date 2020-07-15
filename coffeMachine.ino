@@ -10,8 +10,8 @@
 
 #define pistao 10
 #define cafeLongo 11
-#define cafeComLeite 12
-#define cappuccino 13
+#define cappuccino 12
+#define cafeComLeite 13
 #define chocolate A0
 #define aguaQuente A1
 #define temperaturaAgua A2
