@@ -64,39 +64,39 @@ void alert(String type)
   if (type == "error")
   {
     digitalWrite(buzzer, 1);
-    delay(500);
+    delay(100);
     digitalWrite(buzzer, 0);
-    delay(500);
+    delay(100);
     digitalWrite(buzzer, 1);
-    delay(500);
+    delay(100);
     digitalWrite(buzzer, 0);
-    delay(500);
+    delay(100);
   }
   else if (type == "hoting")
   {
     digitalWrite(buzzer, 1);
-    delay(500);
+    delay(100);
     digitalWrite(buzzer, 0);
-    delay(500);
+    delay(100);
     digitalWrite(buzzer, 1);
-    delay(500);
+    delay(100);
     digitalWrite(buzzer, 0);
-    delay(500);
+    delay(100);
     digitalWrite(buzzer, 1);
-    delay(500);
+    delay(100);
     digitalWrite(buzzer, 0);
-    delay(500);
+    delay(100);
     digitalWrite(buzzer, 1);
-    delay(500);
+    delay(100);
     digitalWrite(buzzer, 0);
-    delay(500);
+    delay(100);
   }
   else if ("ok")
   {
     digitalWrite(buzzer, 1);
-    delay(500);
+    delay(100);
     digitalWrite(buzzer, 0);
-    delay(500);
+    delay(100);
   }
 }
 
