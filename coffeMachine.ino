@@ -39,7 +39,7 @@ void initializing()
   Serial.println("opening clear coffe");
   clearCoffe();
   // pressurização caldeira
-  hotWaterFunc();
+  // hotWaterFunc();
   Serial.println("finish initialization");
 }
 
@@ -123,6 +123,7 @@ void clearCoffe()
       state = 1;
     }
   }
+  delay(2000);
   digitalWrite(pistaoCafe, 0);
 
   // Stop piston
@@ -164,7 +165,7 @@ void coffeOut()
   {
     alert("ok");
     hotWaterFunc();
-    valveOut(valvulaCafe, 13000);
+    valveOut(valvulaCafe, 10000);
     able = 0;
     alert("ok");
   }
@@ -179,7 +180,7 @@ void coffeWithMilkOut()
   {
     alert("ok");
     hotWaterFunc();
-    valveOut(coffeWithMilk, 13000);
+    valveOut(coffeWithMilk, 5000);
     able = 0;
     alert("ok");
   }
@@ -194,7 +195,7 @@ void cappuccinoOut()
   {
     alert("ok");
     hotWaterFunc();
-    valveOut(coffeChocolate, 13000);
+    valveOut(coffeChocolate, 5000);
     able = 0;
     alert("ok");
   }
@@ -207,7 +208,7 @@ void valveOut(int valve, int timeSet)
 {
   int clearCup = 500,
       milkTime = 3000,
-      timeScrashBeans = 5000;
+      timeScrashBeans = 6000;
   unsigned long currentTime = millis();
   int timeToValveAndMilk = timeSet + currentTime;
   int timePressure = 1000 + timeToValveAndMilk;
@@ -242,123 +243,64 @@ void valveOut(int valve, int timeSet)
       break;
     case valvulaCafe:
 
-      clearCoffe();
       digitalWrite(moedorCafe, 1);
       delay(timeScrashBeans);
       digitalWrite(moedorCafe, 0);
+
+      digitalWrite(pistaoCafe, 1);
+      while (countPistonCicle != 1)
+      {
+        Serial.print(pistonSensor);
+        Serial.println(state);
+        readSensors();
+        if (pistonSensor == 1 && state == 1)
+        {
+          state = 0;
+          countPistonCicle++;
+          //
+        }
+        else if (pistonSensor == 0 && state == 0)
+        {
+          state = 1;
+        }
+      }
+
+      digitalWrite(pistaoCafe, 0);
       digitalWrite(valve, 1);
       digitalWrite(valvulaPressurizacao, 1);
       delay(timeSet);
       digitalWrite(valve, 0);
       delay(1000);
       digitalWrite(valvulaPressurizacao, 0);
+      clearCoffe();
       break;
     case coffeWithMilk:
+      Serial.print("coffeWithMilk init");
+      coffeOut();
       digitalWrite(valvulaChocolate_Leite, HIGH);
       digitalWrite(alimentadorLeite, HIGH);
       digitalWrite(valvulaPressurizacao, HIGH);
-      digitalWrite(pistaoCafe, HIGH);
-      currentTime = millis();
-      timeToValveAndMilk = timeSet + currentTime;
-      timePressure = 1000 + timeToValveAndMilk;
-      countPistonCicle = 0;
-      state = 0;
-      while (timePressure + 1000 < currentTime)
-      {
-        readSensors();
-        currentTime = millis();
-        asyncOperation(valvulaChocolate_Leite, timeToValveAndMilk, currentTime);
-        asyncOperation(alimentadorLeite, timeToValveAndMilk, currentTime);
-        asyncOperation(valvulaPressurizacao, timePressure, currentTime);
-        // Trigger piston
-        // Serial.println(countPistonCicle);
-        if (countPistonCicle != 2 && countPistonCicle <= 2)
-        {
-          readSensors();
-          if (pistonSensor == 1 && state == 1)
-          {
-            state = 0;
-            countPistonCicle++;
-            //
-          }
-          else if (pistonSensor == 0 && state == 0)
-          {
-            state = 1;
-          }
-        }
-        else if (countPistonCicle == 2)
-        {
-          digitalWrite(pistaoCafe, 0);
-          digitalWrite(moedorCafe, HIGH);
-          timeScrashBeans = timeScrashBeans + currentTime;
-          countPistonCicle = 3;
-        }
-        else if (countPistonCicle == 3)
-        {
-          asyncOperation(moedorCafe, timeScrashBeans, currentTime);
-          Serial.println(countPistonCicle);
-        }
-      }
-      digitalWrite(valvulaCafe, HIGH);
-      digitalWrite(valvulaPressurizacao, HIGH);
       delay(timeSet);
-      digitalWrite(valvulaCafe, LOW);
+      digitalWrite(valvulaChocolate_Leite, LOW);
+      digitalWrite(alimentadorLeite, LOW);
       delay(1000);
       digitalWrite(valvulaPressurizacao, LOW);
-      Serial.print("finish");
+      Serial.print("coffeWithMilk finish");
       break;
     case coffeChocolate:
+      Serial.print("Init coffeChocolate");
       digitalWrite(valvulaChocolate_Leite, HIGH);
       digitalWrite(alimentadorChocolate, HIGH);
       digitalWrite(valvulaPressurizacao, HIGH);
-      digitalWrite(pistaoCafe, HIGH);
-      currentTime = millis();
-      timeToValveAndMilk = timeSet + currentTime;
-      timePressure = 1000 + timeToValveAndMilk;
-      timeScrashBeans = 5000;
-      countPistonCicle = 0;
-      state = 0;
-      while (timePressure + 1000 < currentTime)
-      {
-        readSensors();
-        currentTime = millis();
-        asyncOperation(valvulaChocolate_Leite, timeToValveAndMilk, currentTime);
-        asyncOperation(alimentadorChocolate, timeToValveAndMilk, currentTime);
-        asyncOperation(valvulaPressurizacao, timePressure, currentTime);
-        // Trigger piston
-        if (countPistonCicle != 2 && countPistonCicle <= 2)
-        {
-          readSensors();
-          if (pistonSensor == 1 && state == 1)
-          {
-            state = 0;
-            countPistonCicle++;
-            //
-          }
-          else if (pistonSensor == 0 && state == 0)
-          {
-            state = 1;
-          }
-        }
-        else if (countPistonCicle == 2)
-        {
-          digitalWrite(pistaoCafe, 0);
-          digitalWrite(moedorCafe, HIGH);
-          timeScrashBeans = timeScrashBeans + currentTime;
-          countPistonCicle = 3;
-        }
-        else if (countPistonCicle == 3)
-        {
-          asyncOperation(moedorCafe, timeScrashBeans, currentTime);
-          Serial.println(countPistonCicle);
-        }
-      }
-      digitalWrite(valvulaCafe, HIGH);
-      digitalWrite(valvulaPressurizacao, HIGH);
       delay(timeSet);
-      digitalWrite(valvulaCafe, LOW);
+      digitalWrite(valvulaChocolate_Leite, LOW);
+      digitalWrite(alimentadorChocolate, LOW);
       delay(1000);
       digitalWrite(valvulaPressurizacao, LOW);
+
+      coffeOut();
+
+      Serial.print("Final coffeChocolate");
       break;
     }
   }
@@ -413,6 +355,7 @@ void loop()
   if (biometrySensor)
   {
     able = 1;
+    alert("ok");
   }
   // Processo de saida de agua quente
   if (hotWaterButton)
